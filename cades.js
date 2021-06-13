@@ -139,6 +139,7 @@ var selectBox = {
 	// logic - operation handling each option
 	select: function(text, logic) {
 		if(!isInit) return;
+		selectBox.current = 0;
 		selectBox.max = text.length - 1;
 		text.forEach(function(opt) {
 			var p = $("<p></p>");
@@ -146,6 +147,7 @@ var selectBox = {
 			selectBox.box.append(p);
 		});
 		selectBox.doLogic = logic;
+		selectBox.update();
 	},
 	clear: function() {
 		if(!isInit) return;
@@ -165,6 +167,7 @@ var selectBox = {
 		repair: function() {
 			if(selectBox.current == -1) return;
 
+			ro.step++;
 			ro.k[ro.rc][selectBox.current]();
 			ro.logic();
 		}
@@ -180,27 +183,27 @@ var ro = {
 	k: [
 		[
 			function() { ro.correct(); },
-			function() { ro.step = 6; },
-			function() { ro.step = 6; },
-			function() { ro.step = 6; }
+			function() { ro.step = 7; },
+			function() { ro.step = 7; },
+			function() { ro.step = 7; }
 		],
 		[
 			function() { ro.proceed(); },
-			function() { ro.step = 6; },
-			function() { ro.step = 6; },
+			function() { ro.step = 7; },
+			function() { ro.step = 7; },
 			function() { ro.correct(); }
 		],
 		[
-			function() { ro.step = 6; },
+			function() { ro.step = 7; },
 			function() { ro.correct(); },
-			function() { ro.step = 6; },
-			function() { ro.step = 6; }
+			function() { ro.step = 7; },
+			function() { ro.step = 7; }
 		],
 		[
-			function() { ro.step = 6; },
-			function() { ro.step = 6; },
+			function() { ro.step = 7; },
+			function() { ro.step = 7; },
 			function() { ro.correct(); },
-			function() { ro.step = 6; }
+			function() { ro.step = 7; }
 		]
 	],
 	step: 0,
@@ -238,11 +241,9 @@ var ro = {
 				ro.of01 = Math.floor((Math.random() * 6) + 10);
 			break;
 			case 3:
-				console.log(ro.of02, "of", ro.of01, ro.rp_temp);
 				if(ro.of02 == ro.of01) {
 					// completed all questions
-					console.log("done");
-					ro.step++;
+					ro.step = 5;
 					ro.logic();
 					break;
 				}
@@ -278,15 +279,21 @@ var ro = {
 				}
 			break;
 			case 4:
+				dialogue.clear();
+				dialogue.text(npcText.repair[ro.rc].response[selectBox.current]);
+				selectBox.clear();
+				dialogue.next();
+				ro.step = 2;
+			break;
+			case 5:
 				// complete
 				dialogue.clear();
 				selectBox.clear();
 				dialogue.text(npcText.finish[0]);
 				dialogue.next();
 			break;
-			case 5:
+			case 6:
 				dialogue.clear();
-				console.log(ro.rp_temp, ro.of01);
 				if(ro.rp_temp == ro.of01) {
 					dialogue.text(npcText.finish[1]);
 					// reset
@@ -295,7 +302,7 @@ var ro = {
 					// reset
 				}
 			break;
-			case 6:
+			case 7:
 				// utter failure
 				dialogue.clear();
 				dialogue.text(npcText.repair[ro.rc].response[selectBox.current]);
